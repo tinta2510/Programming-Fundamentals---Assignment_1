@@ -28,16 +28,17 @@ void adventureToKoopa(string file_input, int & HP, int & level, int & remedy, in
     input.close();
 
     //Get the name of input files
-    char files_input_name[100];
+    string files_input_name;
     string file_mush_ghost,file_asclepius_pack,file_merlin_pack;
 
     ifstream input1(file_input);
     input1.seekg(pos+1,ios::beg);
     input1>>files_input_name;
 
-    file_mush_ghost = cut_string(files_input_name);
-    file_asclepius_pack = cut_string(files_input_name);
-    file_merlin_pack = cut_string(files_input_name);
+    short int count_string=0;
+    file_mush_ghost = cut_string(files_input_name, count_string);
+    file_asclepius_pack = cut_string(files_input_name, count_string);
+    file_merlin_pack = cut_string(files_input_name, count_string);
     input1.close();
 
     bool lancelot = false;
@@ -45,17 +46,14 @@ void adventureToKoopa(string file_input, int & HP, int & level, int & remedy, in
     else if (check_prime_number(HP)) lancelot = true; //lancelot
 
     //Event
-    int count_event_6=0,count_event_7=0,level_event_7; //dem so vong phat cho su kien 6
+    int count_event_6=0,count_event_7=0,level_event_7=0,count_event_19=0; //dem so vong phat cho su kien 6
     for(int i=0;(i<num)&&(rescue==-1);i++){
         if (round[i]==0){
             rescue = 1; 
-            break;
         }
         else if ((1<=round[i])&&(round[i]<=5)){
             if (lancelot) level = level<10? level+1:level;
             else event1_5(HP,level,phoenixdown,rescue,i+1,round[i],maxHP);
-
-            display(HP, level, remedy, maidenkiss, phoenixdown, rescue);
         }
         else if ((round[i]==6)&&(count_event_6==0)&&(count_event_7==0)){
             if (lancelot){
@@ -64,7 +62,6 @@ void adventureToKoopa(string file_input, int & HP, int & level, int & remedy, in
             }
             else event6(HP, level, remedy, i+1, count_event_6);
 
-            display(HP, level, remedy, maidenkiss, phoenixdown, rescue);  
         }
         else if ((round[i]==7)&&(count_event_6==0)&&(count_event_7==0)){
             if (lancelot){
@@ -72,16 +69,12 @@ void adventureToKoopa(string file_input, int & HP, int & level, int & remedy, in
                 else if (level==9) level++;
             }
             else event7(HP, level, maidenkiss, i+1, count_event_7, level_event_7);
-
-            display(HP, level, remedy, maidenkiss, phoenixdown, rescue);
         }
         else if (round[i]==11){
             event11(HP, level, phoenixdown, maxHP);
-            display(HP,level,remedy,maidenkiss,phoenixdown,rescue);  
         }
         else if (round[i]==12){
-            if (HP>1) HP = nearest_Fibonacci(HP);
-            display(HP,level,remedy,maidenkiss,phoenixdown,rescue);  
+            if (HP>1) HP = nearest_Fibonacci(HP); 
         }
         else if (round[i]>=130) {}
         else if (round[i]==15) {if (remedy<99)      remedy++;     }
@@ -89,36 +82,37 @@ void adventureToKoopa(string file_input, int & HP, int & level, int & remedy, in
         else if (round[i]==17) {if (phoenixdown<99) phoenixdown++;}
         else if (round[i]==18) {
             event18(file_merlin_pack, HP, maxHP);
-            display(HP,level,remedy,maidenkiss,phoenixdown,rescue);  
         }
-        else if (round[i]==19) {} ///unfinished
+        else if ((round[i]==19)&&(count_event_19==0)) {
+            event19(file_asclepius_pack, remedy, maidenkiss, phoenixdown);
+            count_event_19++;
+        } 
         else if (round[i]==99) {
             if (lancelot&&(level>=8)) level = 10;
             else if (!lancelot && (level==10));
             else rescue = 0;
-            display(HP,level,remedy,maidenkiss,phoenixdown,rescue); 
         }
 
-
         //Dem so vong phat
-        if ((round[i] == 6)&&(round[i] == 7)) continue;
+        if (round[i] != 6){
+            if ((count_event_6 >= 2)) count_event_6--;
+            else if (count_event_6==1){
+                count_event_6--;
+                HP *= 5;
+                if (HP>maxHP) HP=maxHP;
+            } 
+        }
+        if (round[i] != 7){
+            if ((count_event_7 >= 2)) count_event_7--;
+            else if (count_event_7==1){
+                count_event_7--;
+                level = level_event_7;
+            } 
+        }
+        if ((rescue==-1)&&(i==num-1)) rescue=1; //there are no more events to follow, the knight reaches Koopa
 
-        if ((count_event_6 >= 2)) count_event_6--;
-        else if (count_event_6==1){
-            count_event_6--;
-            HP *= 5;
-            if (HP>maxHP) HP=maxHP;
-        } 
-        if ((count_event_7 >= 2)) count_event_7--;
-        else if (count_event_7==1){
-            count_event_7--;
-            level = level_event_7;
-        } 
+        display(HP,level,remedy,maidenkiss,phoenixdown,rescue);
     }
-
-    if (rescue==-1) rescue=1; //there are no more events to follow, the knight reaches Koopa
-
-    display(HP,level,remedy,maidenkiss,phoenixdown,rescue);   
 }
 
 void event1_5(int & HP, int & level, int & phoenixdown, int & rescue, int i, int event, int maxHP){
@@ -240,12 +234,11 @@ int nearest_Fibonacci(int HP){
     
 }
 
-string cut_string(char * s){
+string cut_string(string s,short int & count_string){
 	string temp;
-	static unsigned short int i=0;
-    for (;s[i]!='\0';i++){
-    	if (s[i] != ',') temp += s[i]; 
-    	else {i++; break;}
+    for (;s[count_string] != '\0';count_string++){
+    	if (s[count_string] != ',') temp += s[count_string]; 
+    	else {count_string++; break;}
     }
     return temp;
 }
@@ -291,5 +284,23 @@ bool substr_in_str(string substr,string str){
 	return 0; 
 }
 
+void event19(string file_asclepius_pack, int & remedy, int & maidenkiss, int & phoenixdown){
+    ifstream asclepius_pack(file_asclepius_pack);
+    short int r1,c1;
+    asclepius_pack>>r1;
+    asclepius_pack>>c1; 
+
+    for (short int row=1;row<=r1;row++){
+        short int num=0;
+        for (short int column=1;column<=c1;column++){
+            short int temp=0; 
+            asclepius_pack>>temp;
+
+            if ((temp==16)&&(num<3)&&(remedy<99)) {remedy++; num++; }
+            else if ((temp==17)&&(num<3)&&(maidenkiss<99)) {maidenkiss++; num++;}
+            else if ((temp==18)&&(num<3)&&(phoenixdown<99)) {phoenixdown++; num++;} 
+        }
+    }
+}
 //g++ -o main main.cpp knight.cpp -I . -std=c++11
 //./main tc1_input

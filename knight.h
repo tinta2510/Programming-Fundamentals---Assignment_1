@@ -18,8 +18,10 @@ bool check_prime_number(int n);
 
 int nearest_Fibonacci(int HP);
 
-string cut_string(char * s);
+string cut_string(string s,short int & count_string);
 
 void event18(string file_merlin_pack, int & HP, int maxHP);
 bool substr_in_str(string substr,string str);
+
+void event19(string file_asclepius_pack, int & remedy, int & maidenkiss, int & phoenixdown);
 #endif // __KNIGHT_H__
