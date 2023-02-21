@@ -8,8 +8,8 @@
       "args": [],
       "stopAtEntry": false,
       "externalConsole": true,
-      "cwd": "d:/Trường/HK222/Programming_Fundamentals/BTL_1/initial",
-      "program": "d:/Trường/HK222/Programming_Fundamentals/BTL_1/initial/build/Debug/outDebug",
+      "cwd": "d:/Trường/HK222/Programming_Fundamentals/BTL_1/Programming-Fundamentals---Assignment_1",
+      "program": "d:/Trường/HK222/Programming_Fundamentals/BTL_1/Programming-Fundamentals---Assignment_1/build/Debug/outDebug",
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [

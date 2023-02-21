@@ -20,5 +20,6 @@ int nearest_Fibonacci(int HP);
 
 string cut_string(char * s);
 
-
+void event18(string file_merlin_pack, int & HP, int maxHP);
+bool substr_in_str(string substr,string str);
 #endif // __KNIGHT_H__

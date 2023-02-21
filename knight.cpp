@@ -12,15 +12,15 @@ void display(int HP, int level, int remedy, int maidenkiss, int phoenixdown, int
 void adventureToKoopa(string file_input, int & HP, int & level, int & remedy, int & maidenkiss, int & phoenixdown, int & rescue){
     ifstream input(file_input);
     //Information about the Knight of the Round Table
-    input>>HP;
-    input>>level;
-    input>>remedy;
-    input>>maidenkiss;
-    input>>phoenixdown;
+    input>>HP; 
+    input>>level; 
+    input>>remedy; 
+    input>>maidenkiss; 
+    input>>phoenixdown; 
     rescue = -1; 
     int maxHP = HP;
     //The itinerary to Koopa
-    int round[100],num=0,pos; //num = the number of round; pos = position of the pointer in fstream
+    int round[100], num=0, pos; //num = the number of round; pos = position of the pointer in fstream
     while (input>>round[num]){ 
         num++;
         pos = input.tellg(); 
@@ -30,44 +30,74 @@ void adventureToKoopa(string file_input, int & HP, int & level, int & remedy, in
     //Get the name of input files
     char files_input_name[100];
     string file_mush_ghost,file_asclepius_pack,file_merlin_pack;
+
     ifstream input1(file_input);
     input1.seekg(pos+1,ios::beg);
-    input1.getline(files_input_name);
+    input1>>files_input_name;
+
     file_mush_ghost = cut_string(files_input_name);
     file_asclepius_pack = cut_string(files_input_name);
     file_merlin_pack = cut_string(files_input_name);
     input1.close();
 
-    cout<<file_mush_ghost<<'\n'<<file_asclepius_pack<<'\n'<<file_merlin_pack<<'\n';
+    bool lancelot = false;
+    if (HP==999) rescue = 1; //King Authur
+    else if (check_prime_number(HP)) lancelot = true; //lancelot
 
     //Event
     int count_event_6=0,count_event_7=0,level_event_7; //dem so vong phat cho su kien 6
     for(int i=0;(i<num)&&(rescue==-1);i++){
         if (round[i]==0){
-            rescue = 1;
+            rescue = 1; 
             break;
         }
-        else if ((1<=round[i])&&(round[i]<=5))
-            event1_5(HP,level,phoenixdown,rescue,i+1,round[i],maxHP);
-            
-        else if ((round[i]==6)&&(count_event_6==0)&&(count_event_7==0)){
-            event6(HP, level, remedy, i+1, count_event_6);
+        else if ((1<=round[i])&&(round[i]<=5)){
+            if (lancelot) level = level<10? level+1:level;
+            else event1_5(HP,level,phoenixdown,rescue,i+1,round[i],maxHP);
+
+            display(HP, level, remedy, maidenkiss, phoenixdown, rescue);
         }
         else if ((round[i]==6)&&(count_event_6==0)&&(count_event_7==0)){
-            event7(HP, level, maidenkiss, i+1, count_event_7, level_event_7);
+            if (lancelot){
+                if (level<=8) level += 2;
+                else if (level==9) level++;
+            }
+            else event6(HP, level, remedy, i+1, count_event_6);
+
+            display(HP, level, remedy, maidenkiss, phoenixdown, rescue);  
+        }
+        else if ((round[i]==7)&&(count_event_6==0)&&(count_event_7==0)){
+            if (lancelot){
+                if (level<=8) level += 2;
+                else if (level==9) level++;
+            }
+            else event7(HP, level, maidenkiss, i+1, count_event_7, level_event_7);
+
+            display(HP, level, remedy, maidenkiss, phoenixdown, rescue);
         }
         else if (round[i]==11){
             event11(HP, level, phoenixdown, maxHP);
+            display(HP,level,remedy,maidenkiss,phoenixdown,rescue);  
         }
         else if (round[i]==12){
             if (HP>1) HP = nearest_Fibonacci(HP);
+            display(HP,level,remedy,maidenkiss,phoenixdown,rescue);  
         }
-        else if (round[i]>=130){
-
+        else if (round[i]>=130) {}
+        else if (round[i]==15) {if (remedy<99)      remedy++;     }
+        else if (round[i]==16) {if (maidenkiss<99)  maidenkiss++; }
+        else if (round[i]==17) {if (phoenixdown<99) phoenixdown++;}
+        else if (round[i]==18) {
+            event18(file_merlin_pack, HP, maxHP);
+            display(HP,level,remedy,maidenkiss,phoenixdown,rescue);  
         }
-        else if (round[i]==15) if (remedy<99)      remedy++;
-        else if (round[i]==16) if (maidenkiss<99)  maidenkiss++;
-        else if (round[i]==17) if (phoenixdown<99) phoenixdown++;
+        else if (round[i]==19) {} ///unfinished
+        else if (round[i]==99) {
+            if (lancelot&&(level>=8)) level = 10;
+            else if (!lancelot && (level==10));
+            else rescue = 0;
+            display(HP,level,remedy,maidenkiss,phoenixdown,rescue); 
+        }
 
 
         //Dem so vong phat
@@ -132,7 +162,7 @@ void event6(int & HP, int & level, int & remedy, int i, int & count_event_6){
 
     if (level>levelO){
         if (level<=8) level += 2;
-        else if (level=9) level++;
+        else if (level==9) level++;
     }
     else if (level<levelO){
         if (remedy>=1){
@@ -152,11 +182,11 @@ void event7(int & HP, int & level, int & maidenkiss, int i, int & count_event_7,
 
     if (level>levelO){
         if (level<=8) level += 2;
-        else if (level=9) level++;
+        else if (level==9) level++;
     }
     else if (level<levelO){
         if (maidenkiss>=1){
-            maidenkiss--; //NOTE NOTE NOTE
+            maidenkiss--; 
         }
         else{
             level_event_7 = level;
@@ -167,13 +197,13 @@ void event7(int & HP, int & level, int & maidenkiss, int i, int & count_event_7,
 }
 
 void event11(int & HP, int level, int phoenixdown, int maxHP){
-    int n1 = ((level + phoenixdown)%5 + 1) * 3;
+    unsigned short int n1 = ((level + phoenixdown)%5 + 1) * 3;
     calculate_HP_event11(HP, n1);
     if (HP>maxHP) HP = maxHP;
 }
 
 void calculate_HP_event11(int & HP,int n1){
-    int s1=0;
+    unsigned short int s1=0;
     for (int i=0;i<n1;i++){
         s1 += 99-2*i;
     }
@@ -187,7 +217,7 @@ void calculate_HP_event11(int & HP,int n1){
 }
 
 bool check_prime_number(int n){
-    int count=0;
+    char count=0;
     if (n>=2){
         for (int i=1;i<=n/2;i++){
             if (n%i==0) count++;
@@ -200,7 +230,7 @@ bool check_prime_number(int n){
 }
 
 int nearest_Fibonacci(int HP){
-    int arr[HP] = {1,1}; 
+    unsigned short int arr[HP] = {1,1}; 
     int i = 2;
     while (arr[i-1]<HP){
         arr[i] = arr[i-1] + arr[i-2];
@@ -212,13 +242,53 @@ int nearest_Fibonacci(int HP){
 
 string cut_string(char * s){
 	string temp;
-	static unsigned int i=0;
+	static unsigned short int i=0;
     for (;s[i]!='\0';i++){
-    	if (s[i] != ',') temp+=s[i]; 
+    	if (s[i] != ',') temp += s[i]; 
     	else {i++; break;}
-
     }
     return temp;
+}
+
+void event18(string file_merlin_pack, int & HP, int maxHP){
+    ifstream merlin_pack(file_merlin_pack);
+    char n9;
+    merlin_pack>>n9;
+    for (int i=0;i<n9;i++){
+        string s;
+        merlin_pack>>s;
+        if (substr_in_str("Merlin",s)) HP += 3;
+        else if (substr_in_str("merlin",s)) HP += 3;
+        else{
+            char count = 0;
+            if ((substr_in_str("M",s))||(substr_in_str("m",s))) count++;
+            if ((substr_in_str("E",s))||(substr_in_str("e",s))) count++;
+            if ((substr_in_str("R",s))||(substr_in_str("r",s))) count++;
+            if ((substr_in_str("L",s))||(substr_in_str("l",s))) count++;
+            if ((substr_in_str("I",s))||(substr_in_str("i",s))) count++;
+            if ((substr_in_str("N",s))||(substr_in_str("n",s))) count++;
+
+            if (count==6) HP += 2;
+        }
+    }
+    if (HP>maxHP) HP = maxHP; //Khong tang qua maxHP
+}
+
+bool substr_in_str(string substr,string str){
+	unsigned short int len = substr.length(),i=0;
+	while (str[i] != '\0'){
+		if (str[i] == substr[0]){
+			char count=1;
+			for (;count<len;count++){
+				if (str[i+count] == substr[count]);
+				else break;
+			}
+			if (count==len) return 1;
+			else i++;
+		}
+		else i++;
+	}
+	return 0; 
 }
 
 //g++ -o main main.cpp knight.cpp -I . -std=c++11
