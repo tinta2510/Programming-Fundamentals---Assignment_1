@@ -28,17 +28,23 @@ void adventureToKoopa(string file_input, int & HP, int & level, int & remedy, in
     input.close();
 
     //Get the name of input files
-    string files_input_name;
+    char files_input_name[100];
+    string file_mush_ghost,file_asclepius_pack,file_merlin_pack;
     ifstream input1(file_input);
     input1.seekg(pos+1,ios::beg);
-    getline(input1,files_input_name);
+    input1.getline(files_input_name);
+    file_mush_ghost = cut_string(files_input_name);
+    file_asclepius_pack = cut_string(files_input_name);
+    file_merlin_pack = cut_string(files_input_name);
     input1.close();
+
+    cout<<file_mush_ghost<<'\n'<<file_asclepius_pack<<'\n'<<file_merlin_pack<<'\n';
 
     //Event
     int count_event_6=0,count_event_7=0,level_event_7; //dem so vong phat cho su kien 6
     for(int i=0;(i<num)&&(rescue==-1);i++){
         if (round[i]==0){
-            event0(rescue);
+            rescue = 1;
             break;
         }
         else if ((1<=round[i])&&(round[i]<=5))
@@ -53,6 +59,15 @@ void adventureToKoopa(string file_input, int & HP, int & level, int & remedy, in
         else if (round[i]==11){
             event11(HP, level, phoenixdown, maxHP);
         }
+        else if (round[i]==12){
+            if (HP>1) HP = nearest_Fibonacci(HP);
+        }
+        else if (round[i]>=130){
+
+        }
+        else if (round[i]==15) if (remedy<99)      remedy++;
+        else if (round[i]==16) if (maidenkiss<99)  maidenkiss++;
+        else if (round[i]==17) if (phoenixdown<99) phoenixdown++;
 
 
         //Dem so vong phat
@@ -74,10 +89,6 @@ void adventureToKoopa(string file_input, int & HP, int & level, int & remedy, in
     if (rescue==-1) rescue=1; //there are no more events to follow, the knight reaches Koopa
 
     display(HP,level,remedy,maidenkiss,phoenixdown,rescue);   
-}
-
-void event0(int & rescue){
-    rescue = 1;
 }
 
 void event1_5(int & HP, int & level, int & phoenixdown, int & rescue, int i, int event, int maxHP){
@@ -187,5 +198,28 @@ bool check_prime_number(int n){
     if (count == 1) return 1;
     else return 0;
 }
+
+int nearest_Fibonacci(int HP){
+    int arr[HP] = {1,1}; 
+    int i = 2;
+    while (arr[i-1]<HP){
+        arr[i] = arr[i-1] + arr[i-2];
+        i++;
+    }
+    return arr[i-2];
+    
+}
+
+string cut_string(char * s){
+	string temp;
+	static unsigned int i=0;
+    for (;s[i]!='\0';i++){
+    	if (s[i] != ',') temp+=s[i]; 
+    	else {i++; break;}
+
+    }
+    return temp;
+}
+
 //g++ -o main main.cpp knight.cpp -I . -std=c++11
 //./main tc1_input
