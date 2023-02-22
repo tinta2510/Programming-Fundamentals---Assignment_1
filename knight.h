@@ -24,4 +24,10 @@ void event18(string file_merlin_pack, int & HP, int maxHP);
 bool substr_in_str(string substr,string str);
 
 void event19(string file_asclepius_pack, int & remedy, int & maidenkiss, int & phoenixdown);
+
+int reverse_number(int a);
+void mush_ghost_1(string file_mush_ghost, int & HP, int maxHP, int & phoenixdown, int & rescue);
+void mush_ghost_2(string file_mush_ghost, int & HP, int maxHP, int & phoenixdown, int & rescue);
+void mush_ghost_3(string file_mush_ghost, int & HP, int maxHP, int & phoenixdown, int & rescue);
+void mush_ghost_4(string file_mush_ghost, int & HP, int maxHP, int & phoenixdown, int & rescue);
 #endif // __KNIGHT_H__

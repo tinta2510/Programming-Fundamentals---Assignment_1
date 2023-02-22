@@ -76,7 +76,32 @@ void adventureToKoopa(string file_input, int & HP, int & level, int & remedy, in
         else if (round[i]==12){
             if (HP>1) HP = nearest_Fibonacci(HP); 
         }
-        else if (round[i]>=130) {}
+        else if (round[i]>=130) {
+            short int temp = reverse_number(round[i]);
+            while ((temp != 0)&&(rescue!=0)){
+                short int s = temp%10;
+                temp /= 10;
+                switch (s){
+                case 1:
+                    mush_ghost_1(file_mush_ghost, HP, maxHP, phoenixdown, rescue);
+                    //cout<<"13.1: "<<HP<<endl; //DRAFT
+                    break;
+                case 2:
+                    mush_ghost_2(file_mush_ghost, HP, maxHP, phoenixdown, rescue);
+                    //cout<<"13.2: "<<HP<<endl; //DRAFT
+                    break;
+                case 3:
+                    mush_ghost_3(file_mush_ghost, HP, maxHP, phoenixdown, rescue);
+                    //cout<<"13.3: "<<HP<<endl; //DRAFT
+                    break;
+                case 4:
+                    mush_ghost_4(file_mush_ghost, HP, maxHP, phoenixdown, rescue);
+                    //cout<<"13.4: "<<HP<<endl;//DRAFT
+                    break;
+                }
+            }
+
+        }
         else if (round[i]==15) {if (remedy<99)      remedy++;     }
         else if (round[i]==16) {if (maidenkiss<99)  maidenkiss++; }
         else if (round[i]==17) {if (phoenixdown<99) phoenixdown++;}
@@ -301,6 +326,167 @@ void event19(string file_asclepius_pack, int & remedy, int & maidenkiss, int & p
             else if ((temp==18)&&(num<3)&&(phoenixdown<99)) {phoenixdown++; num++;} 
         }
     }
+}
+int reverse_number(int a){
+	int b=0;
+	do{
+		b = b*10 + (a%10);
+		a /= 10;
+	} while (a/10 != 0);
+    return b/10;
+}
+void mush_ghost_1(string file_mush_ghost,int & HP, int maxHP, int & phoenixdown, int & rescue){
+    ifstream mushghost(file_mush_ghost);
+    int n2;
+    mushghost>>n2; 
+    int * arr = new int[n2];
+    for (int i = 0;i<n2;i++){
+        mushghost>>arr[i];
+        short int pos = mushghost.tellg();
+        mushghost.seekg(pos+1,ios::beg);
+    }
+
+    short int max=arr[0],min=arr[0],index_max=0,index_min=0;
+    for (int i=1;i<n2;i++){
+        if (arr[i]>=max){max=arr[i]; index_max=i;};
+        if (arr[i]<=min){min=arr[i]; index_min=i;};
+    }
+    HP -= (index_max+index_min);
+
+    if (HP>maxHP) HP = maxHP;
+    if (HP<=0){
+        if (phoenixdown>0){
+            HP = maxHP;
+            phoenixdown--;
+        }
+        else rescue = 0;
+    }
+    delete[] arr; 
+}
+void mush_ghost_2(string file_mush_ghost,int & HP, int maxHP, int & phoenixdown, int & rescue){
+    ifstream mushghost(file_mush_ghost);
+    int n2;
+    mushghost>>n2; 
+    int * arr = new int[n2];
+    for (int i = 0;i<n2;i++){
+        mushghost>>arr[i];
+        short int pos = mushghost.tellg();
+        mushghost.seekg(pos+1,ios::beg);
+    }
+
+    bool check=true;
+
+    short int max=arr[0],index_max=0;
+    for (int i=1;i<n2;i++){
+        if (arr[i]>max){max=arr[i]; index_max=i;};
+    }
+    for (int i=0;i<index_max;i++){
+        if (arr[i+1]<=arr[i]) check=false;
+    }
+    for (int i=index_max;i<n2-1;i++){
+        if (arr[i+1]>=arr[i]) check=false;
+    }
+    if (check) HP -= (max+index_max);
+    else HP += 5;
+
+    if (HP>maxHP) HP = maxHP;
+    if (HP<=0){
+        if (phoenixdown>0){
+            HP = maxHP;
+            phoenixdown--;
+        }
+        else rescue = 0;
+    }
+    delete[] arr;
+}
+void mush_ghost_3(string file_mush_ghost, int & HP, int maxHP, int & phoenixdown, int & rescue){
+    ifstream mushghost(file_mush_ghost);
+    int n2;
+    mushghost>>n2; 
+    int * arr = new int[n2];
+    for (int i = 0;i<n2;i++){
+        mushghost>>arr[i];
+        short int pos = mushghost.tellg();
+        mushghost.seekg(pos+1,ios::beg);
+    }
+
+    for (int i=0;i<n2;i++){
+        if (arr[i]<0) arr[i] = -arr[i];
+        arr[i] = (17*arr[i]+9)%257;
+    }
+
+    short int max=arr[0],min=arr[0],index=0,index_min=0;
+    for (int i=1;i<n2;i++){
+        if (max<arr[i]){
+            max = arr[i];
+            index = i;
+        }
+        if (min>arr[i]){
+            min = arr[i];
+            index_min = i;
+        }
+    }
+    HP -= index_min+index;
+
+    if (HP>maxHP) HP = maxHP;
+    if (HP<=0){
+        if (phoenixdown>0){
+            HP = maxHP;
+            phoenixdown--;
+        }
+        else rescue = 0;
+    }
+    delete[] arr;
+}
+void mush_ghost_4(string file_mush_ghost, int & HP, int maxHP, int & phoenixdown, int & rescue){
+    ifstream mushghost(file_mush_ghost);
+    int n2;
+    mushghost>>n2; 
+    int * arr = new int[n2];
+    for (int i = 0;i<n2;i++){
+        mushghost>>arr[i];
+        short int pos = mushghost.tellg();
+        mushghost.seekg(pos+1,ios::beg);
+    }
+
+    for (int i=0;i<n2;i++){
+        if (arr[i]<0) arr[i] = -arr[i];
+        arr[i] = (17*arr[i]+9)%257;
+    }
+
+    short int max=arr[0], min=arr[0], i_max = 0, i_min=0;
+    if ((arr[0]==arr[1])&&(arr[1]==arr[2])) HP += 12;
+    else if (arr[0]==arr[1]){
+        if (arr[0]>arr[2]) HP -= arr[2] + 2;
+        else HP -= arr[0];
+    }
+    else if (arr[0]==arr[2]){
+        if (arr[0]>arr[1]) HP -= arr[1] + 1;
+        else HP -= arr[0];
+    }
+    else if (arr[1]==arr[2]){
+        if (arr[0]>arr[1]) HP -= arr[1] + 1;
+        else HP -= arr[0];
+    }
+    else{
+        for (int i=0;i<=2;i++){
+            if (max<arr[i]){max = arr[i]; i_max = i;};
+            if (min>arr[i]){min = arr[i]; i_min = i;};
+        }
+        for (int i=0;i<=2;i++){
+            if ((i!=i_max)&&(i!=i_min)) HP -= arr[i] + i;
+        }
+    }
+
+    if (HP>maxHP) HP = maxHP;
+    if (HP<=0){
+        if (phoenixdown>0){
+            HP = maxHP;
+            phoenixdown--;
+        }
+        else rescue = 0;
+    }
+    delete[] arr;
 }
 //g++ -o main main.cpp knight.cpp -I . -std=c++11
 //./main tc1_input
