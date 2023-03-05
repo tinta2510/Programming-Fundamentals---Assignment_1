@@ -37,33 +37,34 @@ void adventureToKoopa(string file_input, int & HP, int & level, int & remedy, in
     file_merlin_pack = cut_string(files_input_name, count_string);
     input1.close();
 
-    bool lancelot = false;
-    if (HP==999) {
-        rescue = 1;
-        display(HP,level,remedy,maidenkiss,phoenixdown,rescue);
-    } //King Authur
-    else if (check_prime_number(HP)) lancelot = true; //lancelot
+    bool lancelot = false, king_arthur = false;
+    if (HP==999)  
+        king_arthur = true;//King Arthur
+    else if (check_prime_number(HP)) 
+        lancelot = true; //lancelot
 
     //Event
-    int count_event_6=0,count_event_7=0,level_event_7=0,count_event_19=0; //dem so vong phat cho su kien 6
-    for(int i=0;(i<num)&&(rescue==-1);i++){
+    int count_event_6 = 0, count_event_7 = 0, level_event_7 = 0; //dem so vong phat cho su kien 6
+    bool count_event_19 = false, count_event_18 = false;
+    for(int i = 0; (i < num) && (rescue == -1); i++){
         if (round[i]==0){
             rescue = 1; 
         }
         else if ((1<=round[i])&&(round[i]<=5)){
-            if (lancelot) level = level<10? level+1:level;
-            else event1_5(HP,level,phoenixdown,rescue,i+1,round[i],maxHP);
+            if (lancelot||king_arthur) 
+                level = level<10? level+1:level;
+            else 
+                event1_5(HP,level,phoenixdown,rescue,i+1,round[i],maxHP);
         }
         else if ((round[i] == 6)&&(count_event_6 == 0)&&(count_event_7 == 0)){
-            if (lancelot){
+            if (lancelot||king_arthur){
                 if (level<=8) level += 2;
                 else if (level==9) level++;
             }
             else event6(HP, level, remedy, i+1, count_event_6);
-
         }
         else if ((round[i] == 7)&&(count_event_6 == 0)&&(count_event_7 == 0)){
-            if (lancelot){
+            if (lancelot||king_arthur){
                 if (level <= 8) level += 2;
                 else if (level == 9) level++;
             }
@@ -100,66 +101,80 @@ void adventureToKoopa(string file_input, int & HP, int & level, int & remedy, in
         else if (round[i] == 15) {if (remedy < 99)      remedy++;     }
         else if (round[i] == 16) {if (maidenkiss < 99)  maidenkiss++; }
         else if (round[i] == 17) {if (phoenixdown < 99) phoenixdown++;}
-        else if (round[i] == 18) {
+        else if ((round[i] == 18) && (!count_event_18)) {
             event18(file_merlin_pack, HP, maxHP);
+            count_event_18 = true;
         }
-        else if ((round[i] == 19)&&(count_event_19 == 0)) {
+        else if ((round[i] == 19)&&(!count_event_19)) {
             event19(file_asclepius_pack, remedy, maidenkiss, phoenixdown);
-            count_event_19++;
+            count_event_19 = true;
         } 
         else if (round[i] == 99) {
             if (lancelot && (level >= 8)) level = 10;
             else if (!lancelot && (level == 10));
+            else if(king_arthur) level = 10;
             else rescue = 0;
         }
-        //Dem so vong phat
-        if (round[i] != 6){
-            if ((count_event_6 >= 2)){
-                if (remedy > 0){
-                    HP *= 5;
+
+    //Dem so vong phat
+        if ((count_event_6 > 0)){
+            if (remedy > 0){
+                HP *= 5;
+                count_event_6 = 0;
+                remedy--;
+                if (HP > maxHP) HP = maxHP;
+            }
+            else{
+                if (count_event_6 == 1){
                     count_event_6 = 0;
-                    remedy--;
-                    if (HP > maxHP) HP = maxHP;
+                    HP *= 5;
+                    if (HP>maxHP) HP=maxHP;
                 }
                 else count_event_6--;
             }
-            else if (count_event_6 == 1){
-                if (remedy > 0){
-                    HP *= 5;
-                    count_event_6 = 0;
-                    remedy--;
-                    if (HP > maxHP) HP = maxHP;
-                }
-                else{
+        }
+        /*else if (count_event_6 == 1){
+            if (remedy > 0){
+                HP *= 5;
+                count_event_6 = 0;
+                remedy--;
+                if (HP > maxHP) HP = maxHP;
+            }
+            else{
                 count_event_6--;
                 HP *= 5;
                 if (HP>maxHP) HP=maxHP;
-                }
-            } 
-        }
-        if (round[i] != 7){
-            if ((count_event_7 >= 2)){ 
-                if (maidenkiss > 0){
+            }
+        } */
+
+        if (count_event_7 > 0){ 
+            if (maidenkiss > 0){
+                level = level_event_7;
+                count_event_7=0;
+                maidenkiss--;
+            }
+            else{
+                if (count_event_7 == 1){
+                    count_event_7 = 0;
                     level = level_event_7;
-                    count_event_7=0;
-                    maidenkiss--;
                 }
                 else count_event_7--;
             }
-            else if (count_event_7==1){
-                if (maidenkiss > 0){
-                    level = level_event_7;
-                    count_event_7 = 0;
-                    maidenkiss--;
-                }
-                else{
-                    count_event_7--;
-                    level = level_event_7;
-                }
-            } 
-        }
-        if ((rescue==-1)&&(i==num-1)) rescue=1; //there are no more events to follow, the knight reaches Koopa
 
+        }
+        /*else if (count_event_7 == 1){
+            if (maidenkiss > 0){
+                level = level_event_7;
+                count_event_7 = 0;
+                maidenkiss--;
+            }
+            else{
+                count_event_7--;
+                level = level_event_7;
+            }
+        } */
+
+        if ((rescue==-1)&&(i==num-1)) rescue=1; //there are no more events to follow, the knight reaches Koopa
         display(HP,level,remedy,maidenkiss,phoenixdown,rescue);
     }
     
@@ -214,7 +229,7 @@ void event6(int & HP, int & level, int & remedy, int i, int & count_event_6){
         }
         else{
             HP = HP<=5? 1: HP/5;
-            count_event_6 = 3;
+            count_event_6 = 4;
         }
     }
 } 
@@ -235,7 +250,7 @@ void event7(int & HP, int & level, int & maidenkiss, int i, int & count_event_7,
         else{
             level_event_7 = level;
             level = 1;
-            count_event_7 = 3;
+            count_event_7 = 4;
         }
     }
 }
@@ -376,23 +391,20 @@ void mush_ghost_1(string file_mush_ghost,int & HP, int maxHP, int & phoenixdown,
         short int pos = mushghost.tellg();
         mushghost.seekg(pos+1,ios::beg);
     }
-
-    if (n2<=2) HP += 12;
-    else{
-        short int max = arr[0], min = arr[0], index_max = 0, index_min = 0;
-        for (int i = 1; i < n2; i++){
-            if (arr[i] >= max){
-                max = arr[i]; 
-                index_max = i;
-            }
-            if (arr[i] <= min){
-                min = arr[i]; 
-                index_min = i;
-            }
-        }
-        HP -= (index_max + index_min);
-    }
     
+    short int max = arr[0], min = arr[0], index_max = 0, index_min = 0;
+    for (int i = 1; i < n2; i++){
+        if (arr[i] >= max){
+            max = arr[i]; 
+            index_max = i;
+        }
+        if (arr[i] <= min){
+            min = arr[i]; 
+            index_min = i;
+        }
+    }
+    HP -= (index_max + index_min);
+
     if (HP > maxHP) HP = maxHP;
     if (HP <= 0){
         if (phoenixdown > 0){
@@ -401,7 +413,6 @@ void mush_ghost_1(string file_mush_ghost,int & HP, int maxHP, int & phoenixdown,
         }
         else rescue = 0;
     }
-
     delete[] arr; 
 }
 void mush_ghost_2(string file_mush_ghost,int & HP, int maxHP, int & phoenixdown, int & rescue){
@@ -495,26 +506,30 @@ void mush_ghost_4(string file_mush_ghost, int & HP, int maxHP, int & phoenixdown
         arr[i] = (17 * arr[i] + 9) % 257;
     }
 
-    short int max = arr[0], min = arr[0], i_max = 0, i_min=0;
-    if ((arr[0] == arr[1]) && (arr[1] == arr[2])) 
+    if (n2 <= 2) 
         HP += 12;
     else{
-        for (int i = 0; i <= 2; i++){
-            if (max <= arr[i]){
-                max = arr[i]; 
-                i_max = i;
+        short int max = arr[0], min = arr[0], i_max = 0, i_min=0;
+        if ((arr[0] == arr[1]) && (arr[1] == arr[2])) 
+            HP += 12;
+        else{
+            for (int i = 0; i <= 2; i++){
+                if (max <= arr[i]){
+                    max = arr[i]; 
+                    i_max = i;
+                }
+                if (min >= arr[i]){
+                    min = arr[i]; 
+                    i_min = i;
+                }
             }
-            if (min >= arr[i]){
-                min = arr[i]; 
-                i_min = i;
-            }
-        }
-        for (int i = 0; i <= 2; i++){
-            if ((i != i_max) && (i != i_min)){
-                if (arr[i] == max) 
-                    HP -= min + i_min;
-                else 
-                    HP -= arr[i] + i;
+            for (int i = 0; i <= 2; i++){
+                if ((i != i_max) && (i != i_min)){
+                    if (arr[i] == max) 
+                        HP -= min + i_min;
+                    else 
+                        HP -= arr[i] + i;
+                }
             }
         }
     }
